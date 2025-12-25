@@ -1,0 +1,510 @@
+{
+  "room_name": "sbx-1yd676-J5GruTPB4uSw4e2gzffEhj",
+  "room_sid": "RM_7MFqCkbHdrCx",
+  "transcript": {
+    "job_id": "AJ_XUVv3WC2Qu5d",
+    "room_id": "RM_7MFqCkbHdrCx",
+    "room": "sbx-1yd676-J5GruTPB4uSw4e2gzffEhj",
+    "events": [
+      {
+        "type": "agent_state_changed",
+        "old_state": "initializing",
+        "new_state": "listening",
+        "created_at": 1766430026.675714
+      },
+      {
+        "type": "user_state_changed",
+        "old_state": "listening",
+        "new_state": "speaking",
+        "created_at": 1766430030.681555
+      },
+      {
+        "type": "user_state_changed",
+        "old_state": "speaking",
+        "new_state": "listening",
+        "created_at": 1766430032.685256
+      },
+      {
+        "type": "user_input_transcribed",
+        "transcript": " Спасибо.",
+        "is_final": true,
+        "speaker_id": null,
+        "language": "ru",
+        "created_at": 1766430035.2616699
+      },
+      {
+        "type": "speech_created",
+        "user_initiated": true,
+        "source": "generate_reply",
+        "created_at": 1766430035.2625
+      },
+      {
+        "type": "conversation_item_added",
+        "item": {
+          "id": "item_eedd83536ed9",
+          "type": "message",
+          "role": "user",
+          "content": [
+            "Спасибо."
+          ],
+          "interrupted": false,
+          "transcript_confidence": 1.0,
+          "extra": {},
+          "metrics": {
+            "started_speaking_at": 1766430030.6810298,
+            "stopped_speaking_at": 1766430032.130582,
+            "transcription_delay": 3.1313588619232178,
+            "end_of_turn_delay": 3.2494587898254395,
+            "on_user_turn_completed_delay": 3.2089999422169058e-06
+          },
+          "created_at": 1766430035.262159,
+          "hash": null
+        },
+        "created_at": 1766430035.382357
+      },
+      {
+        "type": "agent_state_changed",
+        "old_state": "listening",
+        "new_state": "thinking",
+        "created_at": 1766430035.382379
+      },
+      {
+        "type": "agent_state_changed",
+        "old_state": "thinking",
+        "new_state": "speaking",
+        "created_at": 1766430037.5784872
+      },
+      {
+        "type": "user_state_changed",
+        "old_state": "listening",
+        "new_state": "speaking",
+        "created_at": 1766430044.73497
+      },
+      {
+        "type": "conversation_item_added",
+        "item": {
+          "id": "item_66ee2f3dc4a1",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            "Пожалуйста! Всегда рад помочь.<|im_end|>\n"
+          ],
+          "interrupted": true,
+          "transcript_confidence": null,
+          "extra": {},
+          "metrics": {
+            "started_speaking_at": 1766430037.578401,
+            "stopped_speaking_at": 1766430045.1851661,
+            "llm_node_ttft": 0.525781416999962,
+            "tts_node_ttfb": 1.7603669160000663,
+            "e2e_latency": 5.447818994522095
+          },
+          "created_at": 1766430035.38302,
+          "hash": null
+        },
+        "created_at": 1766430045.2771132
+      },
+      {
+        "type": "agent_state_changed",
+        "old_state": "speaking",
+        "new_state": "listening",
+        "created_at": 1766430045.2771661
+      },
+      {
+        "type": "user_input_transcribed",
+        "transcript": " Так, ну расскажи анекдот.",
+        "is_final": true,
+        "speaker_id": null,
+        "language": "ru",
+        "created_at": 1766430045.932066
+      },
+      {
+        "type": "speech_created",
+        "user_initiated": true,
+        "source": "generate_reply",
+        "created_at": 1766430045.932524
+      },
+      {
+        "type": "user_state_changed",
+        "old_state": "speaking",
+        "new_state": "listening",
+        "created_at": 1766430046.284708
+      },
+      {
+        "type": "conversation_item_added",
+        "item": {
+          "id": "item_35a72806bae2",
+          "type": "message",
+          "role": "user",
+          "content": [
+            "Так, ну расскажи анекдот."
+          ],
+          "interrupted": false,
+          "transcript_confidence": 1.0,
+          "extra": {},
+          "metrics": {
+            "started_speaking_at": 1766430044.734748,
+            "stopped_speaking_at": 1766430045.735633,
+            "transcription_delay": 0.19667410850524902,
+            "end_of_turn_delay": 0.6112041473388672,
+            "on_user_turn_completed_delay": 2.666000000317581e-06
+          },
+          "created_at": 1766430045.9324229,
+          "hash": null
+        },
+        "created_at": 1766430046.347601
+      },
+      {
+        "type": "agent_state_changed",
+        "old_state": "listening",
+        "new_state": "thinking",
+        "created_at": 1766430046.3476312
+      },
+      {
+        "type": "agent_state_changed",
+        "old_state": "thinking",
+        "new_state": "speaking",
+        "created_at": 1766430047.3704069
+      },
+      {
+        "type": "user_input_transcribed",
+        "transcript": " Продолжение",
+        "is_final": true,
+        "speaker_id": null,
+        "language": "ru",
+        "created_at": 1766430055.2206929
+      },
+      {
+        "type": "speech_created",
+        "user_initiated": true,
+        "source": "generate_reply",
+        "created_at": 1766430055.2213278
+      },
+      {
+        "type": "conversation_item_added",
+        "item": {
+          "id": "item_e311190dba6b",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            "Хорошо! Вот анекдот:  \n— Доктор, а у вас в больнице крепкий уход?  \n— Да, у нас уход, как в"
+          ],
+          "interrupted": true,
+          "transcript_confidence": null,
+          "extra": {},
+          "metrics": {
+            "started_speaking_at": 1766430047.370355,
+            "stopped_speaking_at": 1766430055.223088,
+            "llm_node_ttft": 0.39185633299985057,
+            "tts_node_ttfb": 1.03685674999997,
+            "e2e_latency": 1.6347219944000244
+          },
+          "created_at": 1766430046.349567,
+          "hash": null
+        },
+        "created_at": 1766430055.3152661
+      },
+      {
+        "type": "agent_state_changed",
+        "old_state": "speaking",
+        "new_state": "listening",
+        "created_at": 1766430055.315298
+      },
+      {
+        "type": "speech_created",
+        "user_initiated": true,
+        "source": "generate_reply",
+        "created_at": 1766430055.780738
+      },
+      {
+        "type": "conversation_item_added",
+        "item": {
+          "id": "item_a60b3dd043b5",
+          "type": "message",
+          "role": "user",
+          "content": [
+            "Продолжение"
+          ],
+          "interrupted": false,
+          "transcript_confidence": 1.0,
+          "extra": {},
+          "metrics": {
+            "transcription_delay": 0,
+            "on_user_turn_completed_delay": 2.499999936844688e-06
+          },
+          "created_at": 1766430055.78034,
+          "hash": null
+        },
+        "created_at": 1766430055.789932
+      },
+      {
+        "type": "agent_state_changed",
+        "old_state": "listening",
+        "new_state": "thinking",
+        "created_at": 1766430055.789954
+      },
+      {
+        "type": "agent_state_changed",
+        "old_state": "thinking",
+        "new_state": "speaking",
+        "created_at": 1766430057.5208452
+      },
+      {
+        "type": "user_input_transcribed",
+        "transcript": " Спасибо.",
+        "is_final": true,
+        "speaker_id": null,
+        "language": "ru",
+        "created_at": 1766430076.914948
+      },
+      {
+        "type": "speech_created",
+        "user_initiated": true,
+        "source": "generate_reply",
+        "created_at": 1766430076.915908
+      },
+      {
+        "type": "conversation_item_added",
+        "item": {
+          "id": "item_164c4957fafb",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            "— Да, у нас уход, как в армии!  \n— А что, плохо?  \n— Нет, просто у меня жена спросила — может, стоит устроиться к вам санитаркой? А я говорю: не надо, милая, и так дома всё под контролем!<|im_end|>\n"
+          ],
+          "interrupted": true,
+          "transcript_confidence": null,
+          "extra": {},
+          "metrics": {
+            "started_speaking_at": 1766430057.520797,
+            "stopped_speaking_at": 1766430076.919404,
+            "llm_node_ttft": 0.3947252919999755,
+            "tts_node_ttfb": 1.337726167000028
+          },
+          "created_at": 1766430055.792158,
+          "hash": null
+        },
+        "created_at": 1766430077.013744
+      },
+      {
+        "type": "agent_state_changed",
+        "old_state": "speaking",
+        "new_state": "listening",
+        "created_at": 1766430077.0137641
+      },
+      {
+        "type": "speech_created",
+        "user_initiated": true,
+        "source": "generate_reply",
+        "created_at": 1766430077.509453
+      },
+      {
+        "type": "conversation_item_added",
+        "item": {
+          "id": "item_13d1fd75762b",
+          "type": "message",
+          "role": "user",
+          "content": [
+            "Спасибо."
+          ],
+          "interrupted": false,
+          "transcript_confidence": 1.0,
+          "extra": {},
+          "metrics": {
+            "transcription_delay": 0,
+            "on_user_turn_completed_delay": 2.083000026686932e-06
+          },
+          "created_at": 1766430077.5091891,
+          "hash": null
+        },
+        "created_at": 1766430077.516342
+      },
+      {
+        "type": "agent_state_changed",
+        "old_state": "listening",
+        "new_state": "thinking",
+        "created_at": 1766430077.516385
+      },
+      {
+        "type": "user_state_changed",
+        "old_state": "listening",
+        "new_state": "speaking",
+        "created_at": 1766430078.6349308
+      },
+      {
+        "type": "agent_state_changed",
+        "old_state": "thinking",
+        "new_state": "listening",
+        "created_at": 1766430079.084501
+      },
+      {
+        "type": "user_state_changed",
+        "old_state": "speaking",
+        "new_state": "listening",
+        "created_at": 1766430079.580752
+      },
+      {
+        "type": "agent_false_interruption",
+        "resumed": false,
+        "created_at": 1766430081.580891,
+        "message": null,
+        "extra_instructions": null
+      },
+      {
+        "type": "close",
+        "error": null,
+        "reason": "participant_disconnected",
+        "created_at": 1766430087.739945
+      }
+    ],
+    "audio_recording_path": null,
+    "audio_recording_started_at": null,
+    "options": {
+      "allow_interruptions": true,
+      "discard_audio_if_uninterruptible": true,
+      "min_interruption_duration": 0.5,
+      "min_interruption_words": 0,
+      "min_endpointing_delay": 0.5,
+      "max_endpointing_delay": 3.0,
+      "max_tool_steps": 3,
+      "user_away_timeout": 15.0,
+      "min_consecutive_speech_delay": 0.0,
+      "preemptive_generation": true
+    },
+    "chat_history": {
+      "items": [
+        {
+          "id": "item_d01f119a6137",
+          "type": "agent_handoff",
+          "new_agent_id": "assistant",
+          "created_at": 1766430025.755923
+        },
+        {
+          "id": "item_eedd83536ed9",
+          "type": "message",
+          "role": "user",
+          "content": [
+            "Спасибо."
+          ],
+          "interrupted": false,
+          "transcript_confidence": 1.0,
+          "extra": {},
+          "metrics": {
+            "started_speaking_at": 1766430030.6810298,
+            "stopped_speaking_at": 1766430032.130582,
+            "transcription_delay": 3.1313588619232178,
+            "end_of_turn_delay": 3.2494587898254395,
+            "on_user_turn_completed_delay": 3.2089999422169058e-06
+          },
+          "created_at": 1766430035.262159
+        },
+        {
+          "id": "item_66ee2f3dc4a1",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            "Пожалуйста! Всегда рад помочь.<|im_end|>\n"
+          ],
+          "interrupted": true,
+          "extra": {},
+          "metrics": {
+            "started_speaking_at": 1766430037.578401,
+            "stopped_speaking_at": 1766430045.1851661,
+            "llm_node_ttft": 0.525781416999962,
+            "tts_node_ttfb": 1.7603669160000663,
+            "e2e_latency": 5.447818994522095
+          },
+          "created_at": 1766430035.38302
+        },
+        {
+          "id": "item_35a72806bae2",
+          "type": "message",
+          "role": "user",
+          "content": [
+            "Так, ну расскажи анекдот."
+          ],
+          "interrupted": false,
+          "transcript_confidence": 1.0,
+          "extra": {},
+          "metrics": {
+            "started_speaking_at": 1766430044.734748,
+            "stopped_speaking_at": 1766430045.735633,
+            "transcription_delay": 0.19667410850524902,
+            "end_of_turn_delay": 0.6112041473388672,
+            "on_user_turn_completed_delay": 2.666000000317581e-06
+          },
+          "created_at": 1766430045.9324229
+        },
+        {
+          "id": "item_e311190dba6b",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            "Хорошо! Вот анекдот:  \n— Доктор, а у вас в больнице крепкий уход?  \n— Да, у нас уход, как в"
+          ],
+          "interrupted": true,
+          "extra": {},
+          "metrics": {
+            "started_speaking_at": 1766430047.370355,
+            "stopped_speaking_at": 1766430055.223088,
+            "llm_node_ttft": 0.39185633299985057,
+            "tts_node_ttfb": 1.03685674999997,
+            "e2e_latency": 1.6347219944000244
+          },
+          "created_at": 1766430046.349567
+        },
+        {
+          "id": "item_a60b3dd043b5",
+          "type": "message",
+          "role": "user",
+          "content": [
+            "Продолжение"
+          ],
+          "interrupted": false,
+          "transcript_confidence": 1.0,
+          "extra": {},
+          "metrics": {
+            "transcription_delay": 0.0,
+            "on_user_turn_completed_delay": 2.499999936844688e-06
+          },
+          "created_at": 1766430055.78034
+        },
+        {
+          "id": "item_164c4957fafb",
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            "— Да, у нас уход, как в армии!  \n— А что, плохо?  \n— Нет, просто у меня жена спросила — может, стоит устроиться к вам санитаркой? А я говорю: не надо, милая, и так дома всё под контролем!<|im_end|>\n"
+          ],
+          "interrupted": true,
+          "extra": {},
+          "metrics": {
+            "started_speaking_at": 1766430057.520797,
+            "stopped_speaking_at": 1766430076.919404,
+            "llm_node_ttft": 0.3947252919999755,
+            "tts_node_ttfb": 1.337726167000028
+          },
+          "created_at": 1766430055.792158
+        },
+        {
+          "id": "item_13d1fd75762b",
+          "type": "message",
+          "role": "user",
+          "content": [
+            "Спасибо."
+          ],
+          "interrupted": false,
+          "transcript_confidence": 1.0,
+          "extra": {},
+          "metrics": {
+            "transcription_delay": 0.0,
+            "on_user_turn_completed_delay": 2.083000026686932e-06
+          },
+          "created_at": 1766430077.5091891
+        }
+      ]
+    },
+    "timestamp": 1766430106.2314088
+  },
+  "recording_path": "recordings/sbx-1yd676-J5GruTPB4uSw4e2gzffEhj_RM_7MFqCkbHdrCx.mp4"
+}

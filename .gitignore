@@ -10,13 +10,3 @@ KMS
 *.egg-info
 .pytest_cache
 .ruff_cache
-
-# Local artifacts / large files
-temp/
-analysis-worker/venv/
-analysis-worker/.venv/
-*.log
-*.log.*
-*.log.gz
-*.mp4
-*.mov

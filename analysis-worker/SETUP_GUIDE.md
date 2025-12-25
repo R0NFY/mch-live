@@ -101,8 +101,10 @@ yc resource-manager folder add-access-binding <FOLDER_ID> \
      - **Вариант (по умолчанию): через наш relay/proxy**:
        - `OPENAI_BASE_URL` = `https://openai-relay.mch.expert` (можно без `/v1`, код добавит сам)
        - `RELAY_TOKEN` = `<ваш relay токен>`
-     - **Fallback: напрямую в OpenAI**:
-       - `OPENAI_API_KEY` = `sk-...`
+    - **Fallback: напрямую в OpenAI**:
+      - `OPENAI_API_KEY` = `sk-...`
+    - **Опционально**:
+      - `CHATGPT_SYSTEM_PROMPT` = `переопределить системный промпт анализа`
 4. **Создать**
 
 ### Через CLI:

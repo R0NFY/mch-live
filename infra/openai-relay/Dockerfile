@@ -16,3 +16,6 @@ EXPOSE 3001
 CMD ["sh", "-lc", "uvicorn relay.app:app --host 0.0.0.0 --port ${PORT}"]
 
 
+
+
+
