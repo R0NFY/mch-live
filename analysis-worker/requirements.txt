@@ -1,0 +1,11 @@
+# Analysis worker dependencies
+# Pin mediapipe to 0.10.14 - minimum required by OceanAI 1.0.0a48
+# Later versions may have removed 'solutions' API
+mediapipe==0.10.14
+torchcodec
+openai>=1.0.0
+boto3
+python-dotenv
+ipython
+opensmile
+# oceanai==1.0.0a48 # Installed manually in Dockerfile to control deps
