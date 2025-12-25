@@ -22,8 +22,16 @@ import boto3
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from bigfive import analyze_with_oceanai, extract_conversation
+
 # Load environment variables
 load_dotenv()
+
+# IMPORTANT: route all ML model weights/caches to a persistent "model volume".
+# This must run BEFORE we read env vars like OCEANAI_CACHE_DIR below.
+from model_paths import configure_model_caches  # noqa: E402
+
+_MODELS_DIR = configure_model_caches()
 
 # Configure logging
 logging.basicConfig(
@@ -31,6 +39,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger("analysis-handler")
+logger.info("Model volume configured: MODELS_DIR=%s", _MODELS_DIR)
 
 # S3 Configuration
 S3_ENDPOINT = os.getenv("S3_ENDPOINT", "https://storage.yandexcloud.net")
@@ -65,24 +74,16 @@ def _normalize_openai_base_url(base_url: Optional[str]) -> Optional[str]:
 
 OPENAI_BASE_URL = _normalize_openai_base_url(OPENAI_BASE_URL)
 
-# OceanAI Configuration
-OCEANAI_LANG = os.getenv("OCEANAI_LANG", "ru")
-OCEANAI_CORPUS = os.getenv("OCEANAI_CORPUS")
-if not OCEANAI_CORPUS:
-    OCEANAI_CORPUS = "mupta" if OCEANAI_LANG.lower().startswith("ru") else "fi"
-OCEANAI_DISK = os.getenv("OCEANAI_DISK", "googledisk")
-OCEANAI_CACHE_DIR = os.getenv("OCEANAI_CACHE_DIR", "/app/oceanai-cache")
-OCEANAI_FORCE_ASR = os.getenv("OCEANAI_FORCE_ASR", "false").lower() in ("1", "true", "yes")
+
+def _resolve_chatgpt_system_prompt(default_prompt: str) -> str:
+    prompt = os.getenv("CHATGPT_SYSTEM_PROMPT")
+    return prompt if prompt else default_prompt
+
 TRANSCRIPT_MAX_CHARS = int(os.getenv("TRANSCRIPT_MAX_CHARS", "12000"))
 
 # Directories in Object Storage
 TRANSCRIPTS_PREFIX = os.getenv("TRANSCRIPTS_PREFIX", "transcripts/")
 REPORTS_PREFIX = "reports/"
-
-_OCEANAI_LOCK = threading.RLock()
-_OCEANAI_RUNNER = None
-_OCEANAI_CONFIG = None
-
 
 def get_s3_client():
     """Create and return S3 client for Yandex Object Storage."""
@@ -154,251 +155,6 @@ def find_transcript(s3_client, room_name: str, max_retries: int = 12, retry_dela
     return {}
 
 
-def _get_transcript_payload(transcript: dict) -> dict:
-    if not isinstance(transcript, dict):
-        return {}
-    payload = transcript.get("transcript")
-    return payload if isinstance(payload, dict) else transcript
-
-
-def _normalize_content(content) -> str:
-    if isinstance(content, list):
-        parts = []
-        for part in content:
-            if isinstance(part, str):
-                parts.append(part)
-            elif isinstance(part, dict):
-                text = part.get("text") or part.get("value") or ""
-                if text:
-                    parts.append(str(text))
-            else:
-                parts.append(str(part))
-        return " ".join(p for p in parts if p).strip()
-    if content is None:
-        return ""
-    return str(content).strip()
-
-
-def _safe_float(value: Optional[object]) -> Optional[float]:
-    try:
-        if value is None:
-            return None
-        num = float(value)
-        if math.isnan(num):
-            return None
-        return num
-    except (TypeError, ValueError):
-        return None
-
-
-def _load_oceanai_models(ocean, corpus: str, disk: str, lang: str) -> None:
-    ocean.load_audio_model_hc(out=False)
-    ocean.load_audio_model_nn(out=False)
-    ocean.load_audio_model_weights_hc(
-        url=ocean.weights_for_big5_["audio"][corpus]["hc"][disk],
-        force_reload=False,
-        out=False,
-    )
-    ocean.load_audio_model_weights_nn(
-        url=ocean.weights_for_big5_["audio"][corpus]["nn"][disk],
-        force_reload=False,
-        out=False,
-    )
-
-    ocean.load_video_model_hc(lang=lang, out=False)
-    ocean.load_video_model_deep_fe(out=False)
-    ocean.load_video_model_nn(out=False)
-    ocean.load_video_model_weights_hc(
-        url=ocean.weights_for_big5_["video"][corpus]["hc"][disk],
-        force_reload=False,
-        out=False,
-    )
-    ocean.load_video_model_weights_deep_fe(
-        url=ocean.weights_for_big5_["video"][corpus]["fe"][disk],
-        force_reload=False,
-        out=False,
-    )
-    ocean.load_video_model_weights_nn(
-        url=ocean.weights_for_big5_["video"][corpus]["nn"][disk],
-        force_reload=False,
-        out=False,
-    )
-
-    ocean.load_text_features(out=False)
-    ocean.setup_translation_model(out=False)
-    ocean.setup_bert_encoder(force_reload=False, out=False)
-    ocean.load_text_model_hc(corpus=corpus, out=False)
-    ocean.load_text_model_weights_hc(
-        url=ocean.weights_for_big5_["text"][corpus]["hc"][disk],
-        force_reload=False,
-        out=False,
-    )
-    ocean.load_text_model_nn(corpus=corpus, out=False)
-    ocean.load_text_model_weights_nn(
-        url=ocean.weights_for_big5_["text"][corpus]["nn"][disk],
-        force_reload=False,
-        out=False,
-    )
-
-    ocean.load_avt_model_b5(out=False)
-    ocean.load_avt_model_weights_b5(
-        url=ocean.weights_for_big5_["avt"][corpus]["b5"][disk],
-        force_reload=False,
-        out=False,
-    )
-
-def _get_oceanai_runner():
-    global _OCEANAI_RUNNER, _OCEANAI_CONFIG
-    config = (OCEANAI_LANG, OCEANAI_CORPUS, OCEANAI_DISK, OCEANAI_CACHE_DIR)
-    with _OCEANAI_LOCK:
-        if _OCEANAI_RUNNER is not None and _OCEANAI_CONFIG == config:
-            return _OCEANAI_RUNNER
-
-        from oceanai.modules.lab.build import Run
-
-        os.makedirs(OCEANAI_CACHE_DIR, exist_ok=True)
-        ocean = Run(lang=OCEANAI_LANG, metadata=False)
-        ocean.path_to_save_ = OCEANAI_CACHE_DIR
-        ocean.path_to_logs_ = os.path.join(OCEANAI_CACHE_DIR, "logs")
-
-        _load_oceanai_models(ocean, OCEANAI_CORPUS, OCEANAI_DISK, OCEANAI_LANG)
-
-        _OCEANAI_RUNNER = ocean
-        _OCEANAI_CONFIG = config
-        return _OCEANAI_RUNNER
-
-
-def analyze_with_oceanai(video_path: str, transcript: Optional[dict] = None) -> dict:
-    """
-    Analyze video with OceanAI for Big Five personality traits.
-    """
-    transcript_text = ""
-    if transcript:
-        transcript_text = extract_conversation(transcript)
-
-    text_path = None
-    use_asr = OCEANAI_FORCE_ASR or not transcript_text
-
-    try:
-        with _OCEANAI_LOCK:
-            ocean = _get_oceanai_runner()
-
-            ocean.path_to_dataset_ = str(Path(video_path).parent)
-            ocean.ext_ = [Path(video_path).suffix.lower()]
-
-            if transcript_text:
-                text_path = Path(video_path).with_suffix(".txt")
-                text_path.write_text(transcript_text, encoding="utf-8")
-
-            logger.info("Running OceanAI analysis...")
-            ok = ocean.get_avt_predictions_gradio(
-                paths=[video_path],
-                lang=OCEANAI_LANG,
-                asr=use_asr,
-                accuracy=False,
-                logs=False,
-                out=False,
-                runtime=False,
-            )
-
-        if not ok:
-            return {'success': False, 'error': 'OceanAI predictions failed'}
-
-        df = ocean.df_files_
-        if df is None or df.empty:
-            return {'success': False, 'error': 'OceanAI produced no scores'}
-
-        row = df.iloc[0].to_dict()
-        scores = {
-            'openness': _safe_float(row.get('Openness')),
-            'conscientiousness': _safe_float(row.get('Conscientiousness')),
-            'extraversion': _safe_float(row.get('Extraversion')),
-            'agreeableness': _safe_float(row.get('Agreeableness')),
-            'non_neuroticism': _safe_float(row.get('Non-Neuroticism')),
-        }
-
-        if not any(v is not None for v in scores.values()):
-            return {'success': False, 'error': 'OceanAI produced empty scores'}
-
-        logger.info(f"OceanAI analysis complete: {scores}")
-        return {
-            'success': True,
-            'scores': scores,
-        }
-    except Exception as e:
-        logger.error(f"OceanAI analysis failed: {e}")
-        return {'success': False, 'error': str(e)}
-    finally:
-        if text_path and text_path.exists():
-            text_path.unlink()
-
-
-def extract_conversation(transcript: dict) -> str:
-    """
-    Extract only the conversation messages from the transcript.
-    Returns a clean text format: 'role: content' for each message.
-    """
-    conversation_lines = []
-
-    payload = _get_transcript_payload(transcript)
-    if not payload:
-        return ""
-
-    logger.info(f"Transcript keys: {list(payload.keys())}")
-
-    # Try to get chat_history.items first (preferred, contains clean messages)
-    chat_history = payload.get('chat_history', {})
-    items = chat_history.get('items', [])
-
-    logger.info(f"Found {len(items)} items in chat_history")
-
-    for item in items:
-        # Only include actual messages, skip agent_handoff and other events
-        if item.get('type') == 'message':
-            role = item.get('role', 'unknown')
-            content = _normalize_content(item.get('content', []))
-            content = content.replace('<|im_end|>', '').strip()
-            if content:
-                # Translate roles for clarity
-                role_display = 'Пользователь' if role == 'user' else 'Ассистент'
-                conversation_lines.append(f"{role_display}: {content}")
-
-    # Fallback: try messages list if present
-    if not conversation_lines:
-        messages = payload.get('messages', [])
-        logger.info(f"Trying messages fallback, found {len(messages)} messages")
-        for msg in messages:
-            role = msg.get('role', 'unknown')
-            content = _normalize_content(msg.get('content', ''))
-            content = content.replace('<|im_end|>', '').strip()
-            if content:
-                role_display = 'Пользователь' if role == 'user' else 'Ассистент'
-                conversation_lines.append(f"{role_display}: {content}")
-
-    # Fallback: try events with user_input_transcribed type
-    if not conversation_lines:
-        events = payload.get('events', [])
-        logger.info(f"Trying events fallback, found {len(events)} events")
-        for event in events:
-            if event.get('type') == 'user_input_transcribed':
-                text = event.get('transcript', '').strip()
-                if text:
-                    conversation_lines.append(f"Пользователь: {text}")
-            elif event.get('type') == 'conversation_item_added':
-                item = event.get('item', {})
-                if item.get('type') == 'message':
-                    role = item.get('role', 'unknown')
-                    content = _normalize_content(item.get('content', []))
-                    content = content.replace('<|im_end|>', '').strip()
-                    if content:
-                        role_display = 'Пользователь' if role == 'user' else 'Ассистент'
-                        conversation_lines.append(f"{role_display}: {content}")
-    
-    result = '\n'.join(conversation_lines)
-    logger.info(f"Extracted {len(conversation_lines)} conversation lines, {len(result)} chars")
-    return result
-
-
 def analyze_with_chatgpt(transcript: dict) -> dict:
     """Analyze transcript with ChatGPT."""
     try:
@@ -437,18 +193,18 @@ def analyze_with_chatgpt(transcript: dict) -> dict:
         logger.info(f"Sending {len(conversation_text)} chars to ChatGPT (conversation only)")
         
         # Prepare messages
-        messages = [
-            {
-                "role": "system",
-                "content": """Проанализируй диалог и верни JSON:
+        system_prompt = _resolve_chatgpt_system_prompt(
+            """Проанализируй диалог и верни JSON:
                     - summary: краткое резюме (2-3 предложения)
                     - topics: ключевые темы (массив)
                     - sentiment: тон (positive/neutral/negative)
                     - key_points: ключевые моменты (массив)
                     - user_intent: что хотел пользователь
                     Только JSON, без markdown."""
-            },
-            {"role": "user", "content": conversation_text}
+        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": conversation_text},
         ]
         
         response = client.chat.completions.create(

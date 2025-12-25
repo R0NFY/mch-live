@@ -8,4 +8,22 @@ boto3
 python-dotenv
 ipython
 opensmile
-# oceanai==1.0.0a48 # Installed manually in Dockerfile to control deps
+gradio
+
+# Big Five / OceanAI
+oceanai==1.0.0a48
+
+# Scientific + ML utilities (kept here so local `uv pip install -r ...` matches Docker)
+numpy
+pandas
+scikit-learn
+librosa
+opencv-python-headless
+transformers
+sentencepiece
+# OceanAI/transformers ecosystem can be sensitive to protobuf versions.
+protobuf==3.20.3
+
+# Serverless HTTP wrapper (used by analysis-worker/Dockerfile runtime)
+flask
+gunicorn

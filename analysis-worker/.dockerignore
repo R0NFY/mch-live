@@ -1,0 +1,16 @@
+# Keep Docker build context tiny and avoid accidentally copying caches/weights.
+
+__pycache__/
+*.pyc
+
+.venv/
+venv/
+
+tests/
+*.log
+*.log.gz
+
+# If you ever symlink a local models dir inside analysis-worker, never send it to Docker.
+models/
+
+
