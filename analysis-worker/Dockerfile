@@ -21,6 +21,11 @@ RUN set -eux; \
 
 WORKDIR /app
 
+ENV OCEANAI_LANG=ru \
+    OCEANAI_CORPUS=mupta \
+    OCEANAI_DISK=googledisk \
+    OCEANAI_CACHE_DIR=/app/oceanai-cache
+
 # Copy requirements and install
 COPY requirements.txt .
 # ENV TEST_MINIMAL=true
@@ -41,6 +46,85 @@ RUN pip install --no-cache-dir --retries 20 --timeout 600 oceanai==1.0.0a48 --no
 # This avoids runtime "No space left on device" errors on serverless containers
 RUN python -c "from transformers import pipeline; pipeline('automatic-speech-recognition', model='openai/whisper-base')" && \
     python -c "from transformers import AutoTokenizer, AutoModel; AutoTokenizer.from_pretrained('bert-base-multilingual-cased'); AutoModel.from_pretrained('bert-base-multilingual-cased')"
+
+# Pre-cache OceanAI weights and helper models to avoid cold-start downloads.
+RUN mkdir -p "${OCEANAI_CACHE_DIR}" && \
+    python - <<'PY'
+import os
+from pathlib import Path
+
+from oceanai.modules.lab.build import Run
+
+lang = os.getenv("OCEANAI_LANG", "ru")
+corpus_env = os.getenv("OCEANAI_CORPUS")
+corpus = corpus_env or ("mupta" if lang.lower().startswith("ru") else "fi")
+disk = os.getenv("OCEANAI_DISK", "googledisk")
+cache = os.getenv("OCEANAI_CACHE_DIR", "/app/oceanai-cache")
+
+Path(cache).mkdir(parents=True, exist_ok=True)
+ocean = Run(lang=lang, metadata=False)
+ocean.path_to_save_ = cache
+ocean.path_to_logs_ = os.path.join(cache, "logs")
+
+def preload(ocean, corpus, disk, lang):
+    ocean.load_audio_model_hc(out=False)
+    ocean.load_audio_model_nn(out=False)
+    ocean.load_audio_model_weights_hc(
+        url=ocean.weights_for_big5_["audio"][corpus]["hc"][disk],
+        force_reload=False,
+        out=False,
+    )
+    ocean.load_audio_model_weights_nn(
+        url=ocean.weights_for_big5_["audio"][corpus]["nn"][disk],
+        force_reload=False,
+        out=False,
+    )
+
+    ocean.load_video_model_hc(lang=lang, out=False)
+    ocean.load_video_model_deep_fe(out=False)
+    ocean.load_video_model_nn(out=False)
+    ocean.load_video_model_weights_hc(
+        url=ocean.weights_for_big5_["video"][corpus]["hc"][disk],
+        force_reload=False,
+        out=False,
+    )
+    ocean.load_video_model_weights_deep_fe(
+        url=ocean.weights_for_big5_["video"][corpus]["fe"][disk],
+        force_reload=False,
+        out=False,
+    )
+    ocean.load_video_model_weights_nn(
+        url=ocean.weights_for_big5_["video"][corpus]["nn"][disk],
+        force_reload=False,
+        out=False,
+    )
+
+    ocean.load_text_features(out=False)
+    ocean.setup_translation_model(out=False)
+    ocean.setup_bert_encoder(force_reload=False, out=False)
+    ocean.load_text_model_hc(corpus=corpus, out=False)
+    ocean.load_text_model_weights_hc(
+        url=ocean.weights_for_big5_["text"][corpus]["hc"][disk],
+        force_reload=False,
+        out=False,
+    )
+    ocean.load_text_model_nn(corpus=corpus, out=False)
+    ocean.load_text_model_weights_nn(
+        url=ocean.weights_for_big5_["text"][corpus]["nn"][disk],
+        force_reload=False,
+        out=False,
+    )
+
+    ocean.load_avt_model_b5(out=False)
+    ocean.load_avt_model_weights_b5(
+        url=ocean.weights_for_big5_["avt"][corpus]["b5"][disk],
+        force_reload=False,
+        out=False,
+    )
+
+preload(ocean, corpus, disk, lang)
+print(f"OceanAI assets cached to {cache} (corpus={corpus}, disk={disk}, lang={lang})")
+PY
 
 # Copy handler code
 COPY handler.py .

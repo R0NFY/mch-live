@@ -71,7 +71,7 @@ OCEANAI_CORPUS = os.getenv("OCEANAI_CORPUS")
 if not OCEANAI_CORPUS:
     OCEANAI_CORPUS = "mupta" if OCEANAI_LANG.lower().startswith("ru") else "fi"
 OCEANAI_DISK = os.getenv("OCEANAI_DISK", "googledisk")
-OCEANAI_CACHE_DIR = os.getenv("OCEANAI_CACHE_DIR", "/tmp/oceanai")
+OCEANAI_CACHE_DIR = os.getenv("OCEANAI_CACHE_DIR", "/app/oceanai-cache")
 OCEANAI_FORCE_ASR = os.getenv("OCEANAI_FORCE_ASR", "false").lower() in ("1", "true", "yes")
 TRANSCRIPT_MAX_CHARS = int(os.getenv("TRANSCRIPT_MAX_CHARS", "12000"))
 
