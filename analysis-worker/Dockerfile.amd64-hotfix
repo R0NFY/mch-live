@@ -3,6 +3,8 @@ FROM cr.yandex/crpv9gnnri1vqg1cof2b/analysis-worker@sha256:d3452589b42d3ad17aab0
 # The published image digest we pulled locally appears to be missing IPython,
 # but OceanAI imports it internally in some codepaths.
 # This hotfix layer is intentionally small to make local amd64 testing reliable.
-RUN pip install --no-cache-dir --retries 20 --timeout 600 ipython opensmile
+ENV OCEANAI_CACHE_DIR=/app/oceanai-cache
 
+RUN mkdir -p "${OCEANAI_CACHE_DIR}"
+RUN pip install --no-cache-dir --retries 20 --timeout 600 ipython opensmile
 
